@@ -9,14 +9,35 @@
 import SpriteKit
 
 class GameScene: SKScene {
+    var sprite = SKSpriteNode()
+    
     override func didMoveToView(view: SKView) {
-        /* Setup your scene here */
-        let myLabel = SKLabelNode(fontNamed:"Chalkduster")
-        myLabel.text = "Hello, World!"
-        myLabel.fontSize = 45
-        myLabel.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
+        self.backgroundColor = SKColor.blackColor()
         
-        self.addChild(myLabel)
+        sprite = SKSpriteNode(imageNamed:"Spaceship")
+        sprite.yScale = 0.15
+        sprite.xScale = 0.15
+        sprite.position = CGPointMake(100, 100)
+        self.addChild(sprite)
+        
+        let followSprite = SKSpriteNode(imageNamed:"Spaceship")
+        followSprite.xScale = 0.15
+        followSprite.yScale = 0.15
+        followSprite.position = CGPointMake(150, 150)
+        followSprite.color = SKColor.redColor()
+        followSprite.colorBlendFactor = 0.8
+        self.addChild(followSprite)
+        
+        let rangeToSprite = SKRange(lowerLimit: 100, upperLimit: 150)
+        
+        let distanceConstraint = SKConstraint.distance(rangeToSprite, toNode: sprite)
+        
+        let rangeForOrientation = SKRange(lowerLimit: CGFloat(M_2_PI * 7), upperLimit: CGFloat(M_2_PI * 7))
+        
+        let orientConstraint = SKConstraint.orientToNode(sprite, offset: rangeForOrientation)
+        
+        followSprite.constraints = [distanceConstraint, orientConstraint]
+        
     }
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -25,17 +46,8 @@ class GameScene: SKScene {
         for touch in touches {
             let location = touch.locationInNode(self)
             
-            let sprite = SKSpriteNode(imageNamed:"Spaceship")
-            
-            sprite.xScale = 0.5
-            sprite.yScale = 0.5
-            sprite.position = location
-            
-            let action = SKAction.rotateByAngle(CGFloat(M_PI), duration:1)
-            
-            sprite.runAction(SKAction.repeatActionForever(action))
-            
-            self.addChild(sprite)
+            let action = SKAction.moveTo(location, duration: 1)
+            sprite.runAction(action)
         }
     }
    
